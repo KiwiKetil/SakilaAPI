@@ -32,8 +32,10 @@ public class ActorRepositoryEF : IActorRepository
         return res;
     }
 
-      public Task<Actor?> GetActorByIdAsync(int id)
+      public async Task<Actor?> GetActorByIdAsync(ushort id)
     {
-        throw new NotImplementedException();
+        _logger.LogInformation("Retrieveing actor by Id using EF");
+
+        return await _sakilaContext.Actors.FindAsync(id);
     }
 }

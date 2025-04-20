@@ -45,9 +45,9 @@ public class ActorRepositoryDapper : IActorRepository
         return actors;
     }
 
-     public async Task<Actor?> GetActorByIdAsync(int id)
+     public async Task<Actor?> GetActorByIdAsync(ushort id)
     {
-        _logger.LogInformation("Retrieving actor by ID using Dapper");
+        _logger.LogInformation("Retrieving actor by Id using Dapper");
 
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
 

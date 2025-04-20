@@ -27,7 +27,7 @@ public class ActorController : ControllerBase
     }
 
     [HttpGet("{id}", Name = "GetActorById")]
-    public async Task<ActionResult<ActorDto>> GetActorById(int id)
+    public async Task<ActionResult<ActorDto>> GetActorById(ushort id)
     {
          _logger.LogInformation("Retrieving Actor by Id"); 
 

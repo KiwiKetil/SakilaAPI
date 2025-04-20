@@ -31,7 +31,7 @@ public class ActorService : IActorService
         return dtos;
     }
 
-    public async Task<ActorDto?> GetActorByIdAsync(int id)
+    public async Task<ActorDto?> GetActorByIdAsync(ushort id)
     {
         var actor = await _actorRepository.GetActorByIdAsync(id);
         return actor != null ? _actorMapper.MapToDto(actor) : null;;

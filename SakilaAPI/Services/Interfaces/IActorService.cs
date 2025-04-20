@@ -6,5 +6,5 @@ namespace SakilaAPI.Services.Interfaces;
 public interface IActorService
 {
     Task<IEnumerable<ActorDto>>GetActorsAsync(int page, int pageSize);
-    Task<ActorDto?>GetActorByIdAsync(int id);
+    Task<ActorDto?>GetActorByIdAsync(ushort id);
 }
