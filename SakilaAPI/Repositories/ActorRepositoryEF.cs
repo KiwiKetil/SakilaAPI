@@ -5,16 +5,16 @@ using SakilaAPI.Repositories.Interfaces;
 
 namespace SakilaAPI.Repositories;
 
-public class ActorRepository : IActorRepository
+public class ActorRepositoryEF : IActorRepository
 {
     private readonly SakilaContext _sakilaContext;
-    private readonly ILogger<ActorRepository> _logger;
+    private readonly ILogger<ActorRepositoryEF> _logger;
 
-    public ActorRepository(SakilaContext sakilaContext, ILogger<ActorRepository> logger)
+    public ActorRepositoryEF(SakilaContext sakilaContext, ILogger<ActorRepositoryEF> logger)
     {
         _sakilaContext = sakilaContext;
         _logger = logger;
-    }
+    }  
 
     public async Task<IEnumerable<Actor>> GetActorsAsync(int page, int pageSize)
     {
@@ -30,5 +30,10 @@ public class ActorRepository : IActorRepository
         .AsNoTracking()
         .ToListAsync();      
         return res;
+    }
+
+      public Task<Actor?> GetActorByIdAsync(int id)
+    {
+        throw new NotImplementedException();
     }
 }

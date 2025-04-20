@@ -31,7 +31,8 @@ public static class ServiceCollectionExtensions
         // Added in WebAppExtensions folder
         
         // Repositories
-        services.AddScoped<IActorRepository, ActorRepositoryDapper>();
+         services.AddScoped<IActorRepository, ActorRepositoryEF>();
+        //services.AddScoped<IActorRepository, ActorRepositoryDapper>();
 
         // MySQLConnector for Dapper
         services.AddScoped<IDbConnectionFactory>(sp =>

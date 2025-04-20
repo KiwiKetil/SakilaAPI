@@ -16,7 +16,7 @@ public class ActorService : IActorService
     {
         _actorRepository = actorRepository;
         _actorMapper = actorMapper;
-    }
+    } 
 
     public async Task<IEnumerable<ActorDto>> GetActorsAsync(int page, int pageSize)
     {
@@ -30,4 +30,10 @@ public class ActorService : IActorService
         
         return dtos;
     }
+
+    public async Task<ActorDto?> GetActorByIdAsync(int id)
+    {
+        var actor = await _actorRepository.GetActorByIdAsync(id);
+        return actor != null ? _actorMapper.MapToDto(actor) : null;;
+    }    
 }
