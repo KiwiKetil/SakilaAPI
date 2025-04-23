@@ -1,5 +1,6 @@
 using Dapper;
 using SakilaAPI.DbConnection.Interfaces;
+using SakilaAPI.Dtos.Actor;
 using SakilaAPI.Models;
 using SakilaAPI.Repositories.Interfaces;
 
@@ -62,5 +63,10 @@ public class ActorRepositoryDapper : IActorRepository
 
         var actor = await connection.QueryFirstOrDefaultAsync<Actor>(sql, new { Id = id});
         return actor;
+    }
+
+    public Task<IEnumerable<ActorFilmCategoryDto>> GetActorsFilmAndCategoryAsync()
+    {
+        throw new NotImplementedException();
     }
 }

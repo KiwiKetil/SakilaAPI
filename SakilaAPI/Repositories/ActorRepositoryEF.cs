@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SakilaAPI.Data;
 using SakilaAPI.Models;
 using SakilaAPI.Repositories.Interfaces;
+using SakilaAPI.Dtos.Actor;
 
 namespace SakilaAPI.Repositories;
 
@@ -37,5 +38,11 @@ public class ActorRepositoryEF : IActorRepository
         _logger.LogInformation("Retrieveing actor by Id using EF");
 
         return await _sakilaContext.Actors.FindAsync(id);
+    }
+
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorsFilmAndCategoryAsync() 
+    {
+        await Task.Delay(10);
+        return [];   
     }
 }

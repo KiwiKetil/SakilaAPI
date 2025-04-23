@@ -1,3 +1,4 @@
+using SakilaAPI.Dtos.Actor;
 using SakilaAPI.DTOs.Actor;
 using SakilaAPI.Mappers;
 using SakilaAPI.Mappers.Interfaces;
@@ -35,5 +36,10 @@ public class ActorService : IActorService
     {
         var actor = await _actorRepository.GetActorByIdAsync(id);
         return actor != null ? _actorMapper.MapToDto(actor) : null;;
-    }    
+    }
+
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorsFilmAndCategoryAsync()
+    {
+        return await _actorRepository.GetActorsFilmAndCategoryAsync();
+    }
 }
