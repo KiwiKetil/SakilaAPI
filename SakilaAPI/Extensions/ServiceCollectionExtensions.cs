@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using SakilaAPI.Data;
 using SakilaAPI.DbConnection;
@@ -15,11 +16,17 @@ public static class ServiceCollectionExtensions
     internal static IServiceCollection AddServices(this IServiceCollection services, IConfiguration config)
     {
         // Controllers
-        services.AddControllers();
+        services.AddControllers()
+        .AddJsonOptions(opts =>
+        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())  // enums as string instead of int pt 1.
+        );;
 
         // Swagger
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(c =>
+        {
+            c.UseInlineDefinitionsForEnums();  // enums as string instead of int pt 2.
+        });
 
         // ExceptionHandlingMiddleware
         services.AddScoped<MiddlewareExceptionHandler>();

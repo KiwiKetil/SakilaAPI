@@ -3,6 +3,7 @@ using SakilaAPI.DTOs.Actor;
 using SakilaAPI.Mappers;
 using SakilaAPI.Mappers.Interfaces;
 using SakilaAPI.Models;
+using SakilaAPI.Models.Enums;
 using SakilaAPI.Repositories.Interfaces;
 using SakilaAPI.Services.Interfaces;
 
@@ -38,8 +39,8 @@ public class ActorService : IActorService
         return actor != null ? _actorMapper.MapToDto(actor) : null;;
     }
 
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorsFilmAndCategoryAsync()
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category)
     {
-        return await _actorRepository.GetActorsFilmAndCategoryAsync();
+        return await _actorRepository.GetActorFilmsByCategoryAsync(category);
     }
 }

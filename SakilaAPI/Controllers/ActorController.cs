@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SakilaAPI.Dtos.Actor;
 using SakilaAPI.DTOs.Actor;
 using SakilaAPI.Models;
+using SakilaAPI.Models.Enums;
 using SakilaAPI.Services.Interfaces;
 
 namespace SakilaAPI.Controllers;
@@ -37,10 +38,10 @@ public class ActorController : ControllerBase
     }
 
     [HttpGet("films‑and‑categories", Name = "GetActorsFilmAndCategory")]
-    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorsFilmAndCategory()
+    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByCategory([FromQuery]FilmCategoryEnum category)
     {
         _logger.LogInformation("Retrieving Actor by Films and categories"); 
         
-        return Ok(await _actorService.GetActorsFilmAndCategoryAsync());
+        return Ok(await _actorService.GetActorFilmsByCategoryAsync(category));
     }
 }

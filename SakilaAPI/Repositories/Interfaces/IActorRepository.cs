@@ -1,5 +1,6 @@
 using SakilaAPI.Dtos.Actor;
 using SakilaAPI.Models;
+using SakilaAPI.Models.Enums;
 
 namespace SakilaAPI.Repositories.Interfaces;
 
@@ -7,5 +8,5 @@ public interface IActorRepository
 {
     Task<IEnumerable<Actor>> GetActorsAsync(int page, int pageSize);
     Task<Actor?> GetActorByIdAsync(ushort id);
-    Task<IEnumerable<ActorFilmCategoryDto>> GetActorsFilmAndCategoryAsync();
+    Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category);
 }

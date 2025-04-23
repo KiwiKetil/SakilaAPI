@@ -3,6 +3,8 @@ using SakilaAPI.Data;
 using SakilaAPI.Models;
 using SakilaAPI.Repositories.Interfaces;
 using SakilaAPI.Dtos.Actor;
+using System.Security.Cryptography;
+using SakilaAPI.Models.Enums;
 
 namespace SakilaAPI.Repositories;
 
@@ -40,9 +42,20 @@ public class ActorRepositoryEF : IActorRepository
         return await _sakilaContext.Actors.FindAsync(id);
     }
 
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorsFilmAndCategoryAsync() 
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category) 
     {
-        await Task.Delay(10);
-        return [];   
+        _logger.LogInformation("Retrieveing actors by film and category using EF");
+
+        return await _sakilaContext.FilmActors
+            .AsNoTracking()                                    // read-only, no change-tracking
+            .Where(fa => fa.Film.FilmCategories                // navigate into the join
+            .Any(fc => fc.CategoryId == (int)category))   // filter by category Id in SQL
+            .Select(fa => new ActorFilmCategoryDto(              // project to DTO before materializing
+                fa.Actor.FirstName,
+                fa.Actor.LastName,
+                fa.Film.Title,
+                category.ToString()
+        ))
+        .ToListAsync();                        
     }
 }

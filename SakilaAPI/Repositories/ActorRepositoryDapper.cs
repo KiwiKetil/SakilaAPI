@@ -2,6 +2,7 @@ using Dapper;
 using SakilaAPI.DbConnection.Interfaces;
 using SakilaAPI.Dtos.Actor;
 using SakilaAPI.Models;
+using SakilaAPI.Models.Enums;
 using SakilaAPI.Repositories.Interfaces;
 
 namespace SakilaAPI.Repositories;
@@ -65,7 +66,7 @@ public class ActorRepositoryDapper : IActorRepository
         return actor;
     }
 
-    public Task<IEnumerable<ActorFilmCategoryDto>> GetActorsFilmAndCategoryAsync()
+    public Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category)
     {
         throw new NotImplementedException();
     }
