@@ -21,27 +21,27 @@ public class ActorController : ControllerBase
     }
 
     [HttpGet(Name = "GetActors")]
-    public async Task<ActionResult<IEnumerable<ActorDto>>> GetActors(int page = 1, int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<ActorDto>>> GetActors(CancellationToken cancellationToken, int page = 1, int pageSize = 10)
     {
         _logger.LogInformation("Retrieving Actors"); 
-        var res = await _actorService.GetActorsAsync(page, pageSize);;
+        var res = await _actorService.GetActorsAsync(page, pageSize, cancellationToken);;
         return Ok(res);
     }
 
     [HttpGet("{id}", Name = "GetActorById")]
-    public async Task<ActionResult<ActorDto>> GetActorById(ushort id)
+    public async Task<ActionResult<ActorDto>> GetActorById(ushort id, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Retrieving Actor by Id"); 
 
-        var res = await _actorService.GetActorByIdAsync(id);
+        var res = await _actorService.GetActorByIdAsync(id, cancellationToken);
         return res != null ? Ok(res) : NotFound("No Actor found");
     }
 
     [HttpGet("films‑and‑categories", Name = "GetActorsFilmAndCategory")]
-    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByCategory([FromQuery]FilmCategoryEnum category)
+    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByCategory([FromQuery]FilmCategoryEnum category,  CancellationToken cancellationToken)
     {
         _logger.LogInformation("Retrieving Actor by Films and categories"); 
         
-        return Ok(await _actorService.GetActorFilmsByCategoryAsync(category));
+        return Ok(await _actorService.GetActorFilmsByCategoryAsync(category, cancellationToken));
     }
 }
