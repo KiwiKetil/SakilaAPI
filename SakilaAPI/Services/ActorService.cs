@@ -43,4 +43,9 @@ public class ActorService : IActorService
     {
         return await _actorRepository.GetActorFilmsByCategoryAsync(category, cancellationToken);
     }
+
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastname, CancellationToken cancellationToken)
+    {
+        return await _actorRepository.GetActorFilmsByLastNameAsync(lastname, cancellationToken);
+    }
 }

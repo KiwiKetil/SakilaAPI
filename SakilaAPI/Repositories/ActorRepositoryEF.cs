@@ -59,4 +59,9 @@ public class ActorRepositoryEF : IActorRepository
         ))
         .ToListAsync(cancellationToken);                        
     }
+
+    public Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastname, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 }

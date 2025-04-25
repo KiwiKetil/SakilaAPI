@@ -23,7 +23,7 @@ public class ActorController : ControllerBase
     [HttpGet(Name = "GetActors")]
     public async Task<ActionResult<IEnumerable<ActorDto>>> GetActors(CancellationToken cancellationToken, int page = 1, int pageSize = 10)
     {
-        _logger.LogInformation("Retrieving Actors"); 
+        _logger.LogInformation("Retrieving actors"); 
         var res = await _actorService.GetActorsAsync(page, pageSize, cancellationToken);;
         return Ok(res);
     }
@@ -31,20 +31,27 @@ public class ActorController : ControllerBase
     [HttpGet("{id}", Name = "GetActorById")]
     public async Task<ActionResult<ActorDto>> GetActorById(ushort id, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Retrieving Actor by Id"); 
+        _logger.LogInformation("Retrieving actor by Id"); 
 
         var res = await _actorService.GetActorByIdAsync(id, cancellationToken);
-        return res != null ? Ok(res) : NotFound("No Actor found");
+        return res != null ? Ok(res) : NotFound("No actor found");
     }
 
-    [HttpGet("films‑and‑categories", Name = "GetActorsFilmAndCategory")]
+    [HttpGet("categories", Name = "GetActorsFilmAndCategory")]
     public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByCategory([FromQuery]FilmCategoryEnum category,  CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Retrieving Actor by Films and categories"); 
+        _logger.LogInformation("Retrieving actors by films and categories"); 
         
-        return Ok(await _actorService.GetActorFilmsByCategoryAsync(category, cancellationToken));
+        var res = await _actorService.GetActorFilmsByCategoryAsync(category, cancellationToken);
+        return res.Any() ? Ok(res) : NotFound("No result found");
     }
 
-    [HttpGet("by-actor-lastname", Name = "GetAllActorsFilmsByLastName")]
-    public async Task<ActionResult<IEnumerable<
+    [HttpGet("{lastname}/films", Name = "GetActorFilmsByLastName")]
+    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByLastName(string lastname, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Retrieving actor films by lastname");
+
+        var res = await _actorService.GetActorFilmsByLastNameAsync(lastname, cancellationToken);
+        return res.Any() ? Ok(res) : NotFound("No result found");
+    }
 }
