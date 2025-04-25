@@ -44,4 +44,7 @@ public class ActorController : ControllerBase
         
         return Ok(await _actorService.GetActorFilmsByCategoryAsync(category, cancellationToken));
     }
+
+    [HttpGet("by-actor-lastname", Name = "GetAllActorsFilmsByLastName")]
+    public async Task<ActionResult<IEnumerable<
 }

@@ -80,7 +80,7 @@ public class ActorRepositoryDapper : IActorRepository
 
     public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Retrieveing actors by film and category using EF");
+        _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();      
 
@@ -114,5 +114,13 @@ public class ActorRepositoryDapper : IActorRepository
         return res;
     }
 
-    // Update something
+    // another get with join
+
+    
+
+    // Update 
+
+    // create
+
+    // delete
 }
