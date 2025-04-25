@@ -20,9 +20,9 @@ public class ActorService : IActorService
         _actorMapper = actorMapper;
     } 
 
-    public async Task<IEnumerable<ActorDto>> GetActorsAsync(int page, int pageSize)
+    public async Task<IEnumerable<ActorDto>> GetActorsAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
-        var actors = await _actorRepository.GetActorsAsync(page, pageSize);       
+        var actors = await _actorRepository.GetActorsAsync(page, pageSize, cancellationToken);       
 
         var dtos = actors.Select(actor => 
         {
@@ -33,14 +33,14 @@ public class ActorService : IActorService
         return dtos;
     }
 
-    public async Task<ActorDto?> GetActorByIdAsync(ushort id)
+    public async Task<ActorDto?> GetActorByIdAsync(ushort id, CancellationToken cancellationToken)
     {
-        var actor = await _actorRepository.GetActorByIdAsync(id);
+        var actor = await _actorRepository.GetActorByIdAsync(id, cancellationToken);
         return actor != null ? _actorMapper.MapToDto(actor) : null;;
     }
 
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category)
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category, CancellationToken cancellationToken)
     {
-        return await _actorRepository.GetActorFilmsByCategoryAsync(category);
+        return await _actorRepository.GetActorFilmsByCategoryAsync(category, cancellationToken);
     }
 }
