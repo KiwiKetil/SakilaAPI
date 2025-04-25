@@ -33,8 +33,14 @@ public class ActorRepositoryDapper : IActorRepository
         var sql = @"
                     SELECT 
                         actor_id   AS ActorId,
-                        first_name AS FirstName,
-                        last_name  AS LastName,
+                        CONCAT(
+                            UPPER(SUBSTRING(first_name, 1, 1)),
+                            LOWER(SUBSTRING(first_name, 2))
+                           ) AS FirstName,
+                        CONCAT(
+                            UPPER(SUBSTRING(last_name, 1, 1)),
+                            LOWER(SUBSTRING(last_name, 2))
+                           ) AS LastName,
                         last_update AS LastUpdate
                     FROM Actor
                     ORDER BY actor_id
@@ -61,8 +67,14 @@ public class ActorRepositoryDapper : IActorRepository
         var sql = @"
                     SELECT
                         actor_id AS ActorId,
-                        first_name AS FirstName,
-                        last_name  AS LastName,
+                        CONCAT(
+                            UPPER(SUBSTRING(first_name, 1, 1)),
+                            LOWER(SUBSTRING(first_name, 2))
+                           ) AS FirstName,
+                        CONCAT(
+                            UPPER(SUBSTRING(last_name, 1, 1)),
+                            LOWER(SUBSTRING(last_name, 2))
+                           ) AS LastName,
                         last_update AS LastUpdate
                     FROM Actor
                     WHERE actor_id = @Id";
@@ -80,15 +92,24 @@ public class ActorRepositoryDapper : IActorRepository
 
     public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Retrieveing actors by film and category using EF");
+        _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();      
 
         var sql = @"
                     SELECT 
-                        a.first_name AS Firstname, 
-                        a.last_name AS Lastname,
-                        f.title AS Film,
+                        CONCAT(
+                            UPPER(SUBSTRING(first_name, 1, 1)),
+                            LOWER(SUBSTRING(first_name, 2))
+                           ) AS FirstName,
+                        CONCAT(
+                            UPPER(SUBSTRING(last_name, 1, 1)),
+                            LOWER(SUBSTRING(last_name, 2))
+                           ) AS LastName,
+                        CONCAT(
+                           UPPER(SUBSTRING(f.title, 1, 1)),
+                            LOWER(SUBSTRING(f.title, 2))
+                           ) AS Film,                      
                         @CategoryName AS Category
                     FROM film_actor fa
                     JOIN actor a ON fa.actor_id = a.actor_id
@@ -114,5 +135,19 @@ public class ActorRepositoryDapper : IActorRepository
         return res;
     }
 
-    // Update something
+    // another get with join
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastname, CancellationToken cancellationToken)
+    {
+        await Task.Delay(10, cancellationToken);
+        return [];
+    }
+
+    
+
+
+    // Update 
+
+    // create
+
+    // delete
 }
