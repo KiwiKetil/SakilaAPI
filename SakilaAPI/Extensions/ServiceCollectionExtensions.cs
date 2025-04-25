@@ -34,10 +34,9 @@ public static class ServiceCollectionExtensions
         // Services
         services.AddScoped<IActorService, ActorService>();
 
-        // Mappers
-        // Added in WebAppExtensions folder
+        // Mappers are found in WebAppExtensions folder
         
-        // Repositories
+        // Repositories // Change imlementation to use desired ORM, MicroORM
         // services.AddScoped<IActorRepository, ActorRepositoryEF>();
         services.AddScoped<IActorRepository, ActorRepositoryDapper>();
 
@@ -45,8 +44,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDbConnectionFactory>(sp =>
         new MySqlConnectionFactory(
         config.GetConnectionString("DefaultConnection")!
-            )
-        );
+        ));
 
         // DbContext
         services.AddDbContext<SakilaContext>(options =>
