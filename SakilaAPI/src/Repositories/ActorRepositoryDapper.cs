@@ -32,7 +32,7 @@ public class ActorRepositoryDapper : IActorRepository
 
         var sql = @"
                     SELECT 
-                        actor_id   AS ActorId,
+                        actor_id AS ActorId,
                         CONCAT(
                             UPPER(SUBSTRING(first_name, 1, 1)),
                             LOWER(SUBSTRING(first_name, 2))
@@ -99,12 +99,12 @@ public class ActorRepositoryDapper : IActorRepository
         var sql = @"
                     SELECT 
                         CONCAT(
-                            UPPER(SUBSTRING(first_name, 1, 1)),
-                            LOWER(SUBSTRING(first_name, 2))
+                            UPPER(SUBSTRING(a.first_name, 1, 1)),
+                            LOWER(SUBSTRING(a.first_name, 2))
                            ) AS FirstName,
                         CONCAT(
-                            UPPER(SUBSTRING(last_name, 1, 1)),
-                            LOWER(SUBSTRING(last_name, 2))
+                            UPPER(SUBSTRING(a.last_name, 1, 1)),
+                            LOWER(SUBSTRING(a.last_name, 2))
                            ) AS LastName,
                         CONCAT(
                            UPPER(SUBSTRING(f.title, 1, 1)),
@@ -143,10 +143,19 @@ public class ActorRepositoryDapper : IActorRepository
 
         var sql = @"
                     SELECT 
-                         a.first_name AS FirstName,
-                         a.last_name AS LastName,
-                         f.title AS Film,
-                         c.name AS Category
+                        CONCAT(
+                            UPPER(SUBSTRING(a.first_name, 1, 1)),
+                            LOWER(SUBSTRING(a.first_name, 2))
+                           ) AS FirstName,
+                        CONCAT(
+                            UPPER(SUBSTRING(a.last_name, 1, 1)),
+                            LOWER(SUBSTRING(a.last_name, 2))
+                           ) AS LastName,
+                        CONCAT(
+                            UPPER(SUBSTRING(f.title, 1, 1)),
+                            LOWER (SUBSTRING(f.title, 2))
+                            ) AS Film,                           
+                        c.name AS Category
                     FROM film_actor fa
                     JOIN actor a ON fa.actor_id = a.actor_id
                     JOIN film f ON fa.film_id = f.film_id
