@@ -3,7 +3,6 @@ using SakilaAPI.Data;
 using SakilaAPI.Models;
 using SakilaAPI.Repositories.Interfaces;
 using SakilaAPI.Dtos.Actor;
-using System.Security.Cryptography;
 using SakilaAPI.Models.Enums;
 
 namespace SakilaAPI.Repositories;
@@ -60,7 +59,7 @@ public class ActorRepositoryEF : IActorRepository
         .ToListAsync(cancellationToken);                        
     }
 
-    public Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastname, CancellationToken cancellationToken)
+    public Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

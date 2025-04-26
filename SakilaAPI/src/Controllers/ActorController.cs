@@ -46,12 +46,12 @@ public class ActorController : ControllerBase
         return res.Any() ? Ok(res) : NotFound("No result found");
     }
 
-    [HttpGet("{lastname}/films", Name = "GetActorFilmsByLastName")]
-    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByLastName(string lastname, CancellationToken cancellationToken)
+    [HttpGet("{lastName}/films", Name = "GetActorFilmsByLastName")]
+    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByLastName(string lastName, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Retrieving actor films by lastname");
 
-        var res = await _actorService.GetActorFilmsByLastNameAsync(lastname, cancellationToken);
+        var res = await _actorService.GetActorFilmsByLastNameAsync(lastName, cancellationToken);
         return res.Any() ? Ok(res) : NotFound("No result found");
     }
 }

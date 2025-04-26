@@ -89,7 +89,7 @@ public class ActorRepositoryDapper : IActorRepository
         var actor = await connection.QueryFirstOrDefaultAsync<Actor>(cmd);
         return actor;
     }
-
+    
     public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Retrieveing actors by film and category using Dapper");
@@ -134,17 +134,38 @@ public class ActorRepositoryDapper : IActorRepository
         var res = await connection.QueryAsync<ActorFilmCategoryDto>(cmd);
         return res;
     }
-
-    // another get with join
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastname, CancellationToken cancellationToken)
-    {
-        await Task.Delay(10, cancellationToken);
-        return [];
-    }
-
     
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
 
+        var sql = @"
+                    SELECT 
+                         a.first_name AS FirstName,
+                         a.last_name AS LastName,
+                         f.title AS Film,
+                         c.name AS Category
+                    FROM film_actor fa
+                    JOIN actor a ON fa.actor_id = a.actor_id
+                    JOIN film f ON fa.film_id = f.film_id
+                    JOIN film_category fc ON f.film_id = fc.film_id
+                    JOIN category c ON fc.category_id = c.category_id
+                    WHERE a.last_name LIKE CONCAT(@LastName, '%')                   
+                    ";
+                 
+        var cmd = new CommandDefinition
+        (
+            commandText: sql,
+            parameters: new { LastName = lastName },
+            cancellationToken: cancellationToken
+        );      
+    
+       var res = await connection.QueryAsync<ActorFilmCategoryDto>(cmd);
+       return res;
+    }
+    
     // Update 
 
     // create

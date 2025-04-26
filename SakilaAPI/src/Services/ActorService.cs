@@ -1,6 +1,5 @@
 using SakilaAPI.Dtos.Actor;
 using SakilaAPI.DTOs.Actor;
-using SakilaAPI.Mappers;
 using SakilaAPI.Mappers.Interfaces;
 using SakilaAPI.Models;
 using SakilaAPI.Models.Enums;
@@ -44,8 +43,8 @@ public class ActorService : IActorService
         return await _actorRepository.GetActorFilmsByCategoryAsync(category, cancellationToken);
     }
 
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastname, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken)
     {
-        return await _actorRepository.GetActorFilmsByLastNameAsync(lastname, cancellationToken);
+        return await _actorRepository.GetActorFilmsByLastNameAsync(lastName, cancellationToken);
     }
 }
