@@ -43,8 +43,8 @@ public class ActorService : IActorService
         return await _actorRepository.GetActorFilmsByCategoryAsync(category, cancellationToken);
     }
 
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken, int page, int pageSize)
     {
-        return await _actorRepository.GetActorFilmsByLastNameAsync(lastName, cancellationToken);
+        return await _actorRepository.GetActorFilmsByLastNameAsync(lastName, cancellationToken, page, pageSize);
     }
 }
