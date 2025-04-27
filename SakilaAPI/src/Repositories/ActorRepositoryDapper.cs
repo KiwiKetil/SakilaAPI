@@ -23,10 +23,9 @@ public class ActorRepositoryDapper : IActorRepository
         _logger.LogInformation("Retrieving actors using Dapper");
 
         var parameters = new DynamicParameters();
-
-        var skipnumber = (page -1) * pageSize;        
+        var skipNumber = (page -1) * pageSize;        
         parameters.Add("PageSize", pageSize);
-        parameters.Add("Skipnumber", skipnumber);
+        parameters.Add("Skipnumber", skipNumber);
 
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
 
@@ -45,7 +44,8 @@ public class ActorRepositoryDapper : IActorRepository
                     FROM Actor
                     ORDER BY actor_id
                     LIMIT @PageSize
-                    OFFSET @Skipnumber";
+                    OFFSET @SkipNumber
+                    ";
 
         var cmd = new CommandDefinition
         (
@@ -77,7 +77,8 @@ public class ActorRepositoryDapper : IActorRepository
                            ) AS LastName,
                         last_update AS LastUpdate
                     FROM Actor
-                    WHERE actor_id = @Id";
+                    WHERE actor_id = @Id
+                    ";
 
         var cmd = new CommandDefinition
         (
@@ -135,12 +136,12 @@ public class ActorRepositoryDapper : IActorRepository
         return res;
     }
     
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken, int page, int pageSize)
     {
         _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-
+   
         var sql = @"
                     SELECT 
                         CONCAT(
@@ -161,13 +162,24 @@ public class ActorRepositoryDapper : IActorRepository
                     JOIN film f ON fa.film_id = f.film_id
                     JOIN film_category fc ON f.film_id = fc.film_id
                     JOIN category c ON fc.category_id = c.category_id
-                    WHERE a.last_name LIKE CONCAT(@LastName, '%')                   
+                    WHERE a.last_name LIKE CONCAT(@LastName, '%')   
+                    ORDER BY a.last_name
+                    LIMIT @PageSize
+                    OFFSET @SkipNumber       
                     ";
+
+        var skipNumber = (page -1) * pageSize;     
+        var parameters = new 
+        {
+            PageSize = pageSize,
+            SkipNumber = skipNumber,
+            LastName = lastName
+        };
                  
         var cmd = new CommandDefinition
         (
             commandText: sql,
-            parameters: new { LastName = lastName },
+            parameters: parameters,
             cancellationToken: cancellationToken
         );      
     

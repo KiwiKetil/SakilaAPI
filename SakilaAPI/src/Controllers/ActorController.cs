@@ -47,11 +47,11 @@ public class ActorController : ControllerBase
     }
 
     [HttpGet("{lastName}/films", Name = "GetActorFilmsByLastName")]
-    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByLastName(string lastName, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByLastName(string lastName, CancellationToken cancellationToken, int page = 1, int pageSize = 10)
     {
         _logger.LogInformation("Retrieving actor films by lastname");
 
-        var res = await _actorService.GetActorFilmsByLastNameAsync(lastName, cancellationToken);
+        var res = await _actorService.GetActorFilmsByLastNameAsync(lastName, cancellationToken, page, pageSize);
         return res.Any() ? Ok(res) : NotFound("No result found");
     }
 }
