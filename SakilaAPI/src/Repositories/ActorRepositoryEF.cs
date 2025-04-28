@@ -59,7 +59,12 @@ public class ActorRepositoryEF : IActorRepository
         .ToListAsync(cancellationToken);                        
     }
 
-    public Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken, int page, int pageSize)
+    public Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, int page, int pageSize, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Actor?> DeleteActorAsync(ushort id, CancellationToken ct)
     {
         throw new NotImplementedException();
     }

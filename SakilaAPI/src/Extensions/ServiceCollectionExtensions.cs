@@ -1,13 +1,13 @@
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
-using SakilaAPI.Data;
-using SakilaAPI.DbConnection;
-using SakilaAPI.DbConnection.Interfaces;
 using SakilaAPI.Middleware;
 using SakilaAPI.Repositories;
 using SakilaAPI.Repositories.Interfaces;
 using SakilaAPI.Services;
 using SakilaAPI.Services.Interfaces;
+using SakilaAPI.SakilaDbConnection.Interfaces;
+using SakilaAPI.SakilaDbConnection;
+using SakilaAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SakilaAPI.Extensions;
 

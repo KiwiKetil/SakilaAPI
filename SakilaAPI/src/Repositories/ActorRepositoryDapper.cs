@@ -1,5 +1,5 @@
 using Dapper;
-using SakilaAPI.DbConnection.Interfaces;
+using SakilaAPI.SakilaDbConnection.Interfaces;
 using SakilaAPI.Dtos.Actor;
 using SakilaAPI.Models;
 using SakilaAPI.Models.Enums;
@@ -50,7 +50,8 @@ public class ActorRepositoryDapper : IActorRepository
         var cmd = new CommandDefinition
         (
             commandText: sql,
-            parameters : parameters
+            parameters : parameters,
+            cancellationToken : cancellationToken            
         );
 
         var actors = await connection.QueryAsync<Actor>(cmd);
@@ -136,7 +137,7 @@ public class ActorRepositoryDapper : IActorRepository
         return res;
     }
     
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken, int page, int pageSize)
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, int page, int pageSize, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
@@ -186,10 +187,49 @@ public class ActorRepositoryDapper : IActorRepository
        var res = await connection.QueryAsync<ActorFilmCategoryDto>(cmd);
        return res;
     }
+
+    public async Task<Actor?> DeleteActorAsync(ushort id, CancellationToken ct)
+    {
+        _logger.LogInformation("Deleting actor using Dapper (SELECT-then-DELETE)");
+
+        using var connection  = await _dbConnectionFactory.CreateConnectionAsync();
+        using var transaction = await connection.BeginTransactionAsync(ct);
+
+       const string sql = @" 
+       --1       
+        SELECT
+            actor_id   AS ActorId,
+            first_name AS FirstName,
+            last_name  AS LastName,
+            last_update AS LastUpdate
+        FROM actor
+        WHERE actor_id = @Id;
+
+       --2
+        DELETE FROM film_actor        
+        WHERE actor_id = @Id;
+
+        --3
+        DELETE FROM actor
+        WHERE actor_id = @Id;
+    ";
+        
+        var multi = await connection.QueryMultipleAsync(
+            new CommandDefinition(sql, new { Id = id }, transaction, cancellationToken: ct)
+        );
     
+        var actor = await multi.ReadSingleOrDefaultAsync<Actor>();
+        
+        if (actor is not null)
+            await transaction.CommitAsync(ct);
+        else
+            await transaction.RollbackAsync(ct);
+
+        return actor;
+    }
+   
+
     // Update 
 
     // create
-
-    // delete
 }

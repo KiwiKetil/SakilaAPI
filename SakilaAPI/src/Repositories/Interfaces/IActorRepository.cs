@@ -9,5 +9,6 @@ public interface IActorRepository
     Task<IEnumerable<Actor>> GetActorsAsync(int page, int pageSize, CancellationToken cancellationToken);
     Task<Actor?> GetActorByIdAsync(ushort id, CancellationToken cancellationToken);
     Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category, CancellationToken cancellationToken);
-    Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken, int page, int pageSize);
+    Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, int page, int pageSize, CancellationToken cancellationToken);
+    Task<Actor?> DeleteActorAsync(ushort id, CancellationToken ct);
 }
