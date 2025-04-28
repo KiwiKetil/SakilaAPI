@@ -43,8 +43,14 @@ public class ActorService : IActorService
         return await _actorRepository.GetActorFilmsByCategoryAsync(category, cancellationToken);
     }
 
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, CancellationToken cancellationToken, int page, int pageSize)
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, int page, int pageSize, CancellationToken cancellationToken)
     {
-        return await _actorRepository.GetActorFilmsByLastNameAsync(lastName, cancellationToken, page, pageSize);
+        return await _actorRepository.GetActorFilmsByLastNameAsync(lastName, page, pageSize, cancellationToken);
+    } 
+
+    public async Task<ActorDto?> DeleteActorAsync(ushort id, CancellationToken ct)
+    {
+        var res = await _actorRepository.DeleteActorAsync(id, ct);
+        return res != null ? _actorMapper.MapToDto(res): null;        
     }
 }

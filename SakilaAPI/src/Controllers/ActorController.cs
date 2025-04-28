@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using SakilaAPI.Dtos.Actor;
 using SakilaAPI.DTOs.Actor;
 using SakilaAPI.Models;
@@ -51,7 +52,16 @@ public class ActorController : ControllerBase
     {
         _logger.LogInformation("Retrieving actor films by lastname");
 
-        var res = await _actorService.GetActorFilmsByLastNameAsync(lastName, cancellationToken, page, pageSize);
+        var res = await _actorService.GetActorFilmsByLastNameAsync(lastName, page, pageSize, cancellationToken);
         return res.Any() ? Ok(res) : NotFound("No result found");
+    }
+
+    [HttpDelete("{id}", Name = "DeleteActor")]
+    public async Task<ActionResult<Actor>> DeleteActor(ushort id, CancellationToken ct) 
+    {
+        _logger.LogInformation("Deleting actor by id");
+
+        var res = await _actorService.DeleteActorAsync(id, ct);
+        return res != null ? Ok(res) : NotFound("Delete unsuccesful - actor id not found");
     }
 }
