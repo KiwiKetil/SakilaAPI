@@ -1,7 +1,7 @@
 using System.Data;
 using System.Data.Common;
 
-namespace SakilaAPI.SakilaDbConnection.Interfaces;
+namespace SakilaAPI.DB.Interfaces;
 
 public interface IDbConnectionFactory
 {

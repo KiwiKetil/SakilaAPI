@@ -1,9 +1,9 @@
 using Dapper;
-using SakilaAPI.SakilaDbConnection.Interfaces;
 using SakilaAPI.Dtos.Actor;
 using SakilaAPI.Models;
 using SakilaAPI.Models.Enums;
 using SakilaAPI.Repositories.Interfaces;
+using SakilaAPI.DB.Interfaces;
 
 namespace SakilaAPI.Repositories;
 

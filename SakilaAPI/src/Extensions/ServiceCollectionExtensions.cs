@@ -4,10 +4,10 @@ using SakilaAPI.Repositories;
 using SakilaAPI.Repositories.Interfaces;
 using SakilaAPI.Services;
 using SakilaAPI.Services.Interfaces;
-using SakilaAPI.SakilaDbConnection.Interfaces;
-using SakilaAPI.SakilaDbConnection;
 using SakilaAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using SakilaAPI.DB.Interfaces;
+using SakilaAPI.DB;
 
 namespace SakilaAPI.Extensions;
 
