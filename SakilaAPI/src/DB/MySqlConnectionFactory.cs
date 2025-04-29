@@ -1,8 +1,8 @@
 using System.Data.Common;
 using MySqlConnector;
-using SakilaAPI.SakilaDbConnection.Interfaces;
+using SakilaAPI.DB.Interfaces;
 
-namespace SakilaAPI.SakilaDbConnection;
+namespace SakilaAPI.DB;
 
 public class MySqlConnectionFactory : IDbConnectionFactory
 {
