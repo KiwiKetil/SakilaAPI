@@ -5,8 +5,9 @@
 
 *.bak
 *.sql
-!src/DB/DBScripts/
-!src/DB/DBScripts/**/*.sql
+!SakilaAPI/src/DB/DBScripts/
+!SakilaAPI/src/DB/DBScripts/**/*.sql
+
 .gitattributes
 
 # User-specific files
