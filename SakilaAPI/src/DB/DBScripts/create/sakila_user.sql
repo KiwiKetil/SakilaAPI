@@ -3,3 +3,4 @@ CREATE USER 'apiuser'@'%'
 GRANT SELECT,INSERT,UPDATE,DELETE
   ON sakila.* TO 'apiuser'@'%';
 FLUSH PRIVILEGES;
+#
