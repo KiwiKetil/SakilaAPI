@@ -98,7 +98,7 @@ public class ActorRepositoryDapper : IActorRepository
         return actor;
     }
     
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category, CancellationToken cancellationToken) // add pagination
     {
         _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
@@ -258,15 +258,17 @@ public class ActorRepositoryDapper : IActorRepository
             var setClauses = new List<string>();
             var parameters = new DynamicParameters();
 
-            if (dto.FirstName is not null)
+            if (!string.IsNullOrWhiteSpace(dto.FirstName)
+            && !dto.FirstName.Equals("String", StringComparison.OrdinalIgnoreCase))
             {
                 setClauses.Add("first_name = @FirstName");
-                parameters.Add("FirstName", dto.FirstName);
+                parameters.Add("FirstName", dto.FirstName.ToUpper());
             }
-            if (dto.LastName is not null)
+            if (!string.IsNullOrWhiteSpace(dto.LastName)
+            && !dto.LastName.Equals("String", StringComparison.OrdinalIgnoreCase))
             {
                 setClauses.Add("last_name  = @LastName");
-                parameters.Add("LastName", dto.LastName);
+                parameters.Add("LastName", dto.LastName.ToUpper());
             }
 
             parameters.Add("ActorId", id);
