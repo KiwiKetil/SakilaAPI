@@ -27,23 +27,23 @@ public class ActorRepositoryDapper : IActorRepository
 
         await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
 
-        var sql = @"
-                    SELECT 
-                        actor_id AS ActorId,
-                        CONCAT(
-                            UPPER(SUBSTRING(first_name, 1, 1)),
-                            LOWER(SUBSTRING(first_name, 2))
-                           ) AS FirstName,
-                        CONCAT(
-                            UPPER(SUBSTRING(last_name, 1, 1)),
-                            LOWER(SUBSTRING(last_name, 2))
-                           ) AS LastName,
-                        last_update AS LastUpdate
-                    FROM Actor
-                    ORDER BY actor_id
-                    LIMIT @PageSize
-                    OFFSET @SkipNumber
-                    ";
+        const string sql = @"
+            SELECT 
+                actor_id AS ActorId,
+                CONCAT(
+                    UPPER(SUBSTRING(first_name, 1, 1)),
+                    LOWER(SUBSTRING(first_name, 2))
+                    ) AS FirstName,
+                CONCAT(
+                    UPPER(SUBSTRING(last_name, 1, 1)),
+                    LOWER(SUBSTRING(last_name, 2))
+                    ) AS LastName,
+                last_update AS LastUpdate
+            FROM Actor
+            ORDER BY actor_id
+            LIMIT @PageSize
+            OFFSET @SkipNumber
+            ";
 
         var parameters = new DynamicParameters();
         var skipNumber = (page -1) * pageSize;        
@@ -68,21 +68,21 @@ public class ActorRepositoryDapper : IActorRepository
 
         await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
 
-        var sql = @"
-                    SELECT
-                        actor_id AS ActorId,
-                        CONCAT(
-                            UPPER(SUBSTRING(first_name, 1, 1)),
-                            LOWER(SUBSTRING(first_name, 2))
-                           ) AS FirstName,
-                        CONCAT(
-                            UPPER(SUBSTRING(last_name, 1, 1)),
-                            LOWER(SUBSTRING(last_name, 2))
-                           ) AS LastName,
-                        last_update AS LastUpdate
-                    FROM Actor
-                    WHERE actor_id = @Id
-                    ";
+        const string sql = @"
+            SELECT
+                actor_id AS ActorId,
+                CONCAT(
+                    UPPER(SUBSTRING(first_name, 1, 1)),
+                    LOWER(SUBSTRING(first_name, 2))
+                    ) AS FirstName,
+                CONCAT(
+                    UPPER(SUBSTRING(last_name, 1, 1)),
+                    LOWER(SUBSTRING(last_name, 2))
+                    ) AS LastName,
+                last_update AS LastUpdate
+            FROM Actor
+            WHERE actor_id = @Id
+            ";
 
         var cmd = new CommandDefinition
         (
@@ -101,27 +101,27 @@ public class ActorRepositoryDapper : IActorRepository
 
         await using var connection = await _dbConnectionFactory.CreateConnectionAsync();      
 
-        var sql = @"
-                    SELECT 
-                        CONCAT(
-                            UPPER(SUBSTRING(a.first_name, 1, 1)),
-                            LOWER(SUBSTRING(a.first_name, 2))
-                           ) AS FirstName,
-                        CONCAT(
-                            UPPER(SUBSTRING(a.last_name, 1, 1)),
-                            LOWER(SUBSTRING(a.last_name, 2))
-                           ) AS LastName,
-                        CONCAT(
-                           UPPER(SUBSTRING(f.title, 1, 1)),
-                            LOWER(SUBSTRING(f.title, 2))
-                           ) AS Film,                      
-                        @CategoryName AS Category
-                    FROM film_actor fa
-                    JOIN actor a ON fa.actor_id = a.actor_id
-                    JOIN film f ON fa.film_id = f.film_id
-                    JOIN film_category fc ON f.film_id = fc.film_id
-                    WHERE fc.category_id = @CategoryId
-                    ";                        
+        const string sql = @"
+            SELECT 
+                CONCAT(
+                    UPPER(SUBSTRING(a.first_name, 1, 1)),
+                    LOWER(SUBSTRING(a.first_name, 2))
+                    ) AS FirstName,
+                CONCAT(
+                    UPPER(SUBSTRING(a.last_name, 1, 1)),
+                    LOWER(SUBSTRING(a.last_name, 2))
+                    ) AS LastName,
+                CONCAT(
+                    UPPER(SUBSTRING(f.title, 1, 1)),
+                    LOWER(SUBSTRING(f.title, 2))
+                    ) AS Film,                      
+                @CategoryName AS Category
+            FROM film_actor fa
+            JOIN actor a ON fa.actor_id = a.actor_id
+            JOIN film f ON fa.film_id = f.film_id
+            JOIN film_category fc ON f.film_id = fc.film_id
+            WHERE fc.category_id = @CategoryId
+            ";                        
 
         var parameters = new
         {
@@ -146,31 +146,31 @@ public class ActorRepositoryDapper : IActorRepository
 
         await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
    
-        var sql = @"
-                    SELECT 
-                        CONCAT(
-                            UPPER(SUBSTRING(a.first_name, 1, 1)),
-                            LOWER(SUBSTRING(a.first_name, 2))
-                            ) AS FirstName,
-                        CONCAT(
-                            UPPER(SUBSTRING(a.last_name, 1, 1)),
-                            LOWER(SUBSTRING(a.last_name, 2))
-                           ) AS LastName,
-                        CONCAT(
-                            UPPER(SUBSTRING(f.title, 1, 1)),
-                            LOWER (SUBSTRING(f.title, 2))
-                            ) AS Film,                           
-                        c.name AS Category
-                    FROM film_actor fa
-                    JOIN actor a ON fa.actor_id = a.actor_id
-                    JOIN film f ON fa.film_id = f.film_id
-                    JOIN film_category fc ON f.film_id = fc.film_id
-                    JOIN category c ON fc.category_id = c.category_id
-                    WHERE a.last_name LIKE CONCAT(@LastName, '%')   
-                    ORDER BY a.last_name
-                    LIMIT @PageSize
-                    OFFSET @SkipNumber       
-                    ";
+        const string sql = @"
+            SELECT 
+                CONCAT(
+                    UPPER(SUBSTRING(a.first_name, 1, 1)),
+                    LOWER(SUBSTRING(a.first_name, 2))
+                    ) AS FirstName,
+                CONCAT(
+                    UPPER(SUBSTRING(a.last_name, 1, 1)),
+                    LOWER(SUBSTRING(a.last_name, 2))
+                    ) AS LastName,
+                CONCAT(
+                    UPPER(SUBSTRING(f.title, 1, 1)),
+                    LOWER (SUBSTRING(f.title, 2))
+                    ) AS Film,                           
+                c.name AS Category
+            FROM film_actor fa
+            JOIN actor a ON fa.actor_id = a.actor_id
+            JOIN film f ON fa.film_id = f.film_id
+            JOIN film_category fc ON f.film_id = fc.film_id
+            JOIN category c ON fc.category_id = c.category_id
+            WHERE a.last_name LIKE CONCAT(@LastName, '%')   
+            ORDER BY a.last_name
+            LIMIT @PageSize
+            OFFSET @SkipNumber       
+            ";
 
         var skipNumber = (page -1) * pageSize;     
         var parameters = new 
@@ -200,23 +200,23 @@ public class ActorRepositoryDapper : IActorRepository
         try
         {
             const string sql = @" 
-                            --1       
-                                SELECT
-                                    actor_id   AS ActorId,
-                                    first_name AS FirstName,
-                                    last_name  AS LastName,
-                                    last_update AS LastUpdate
-                                FROM actor
-                                WHERE actor_id = @Id;
+                --1       
+                SELECT
+                    actor_id   AS ActorId,
+                    first_name AS FirstName,
+                    last_name  AS LastName,
+                    last_update AS LastUpdate
+                FROM actor
+                WHERE actor_id = @Id;
 
-                            --2
-                                DELETE FROM film_actor        
-                                WHERE actor_id = @Id;
+                --2
+                DELETE FROM film_actor        
+                WHERE actor_id = @Id;
 
-                                --3
-                                DELETE FROM actor
-                                WHERE actor_id = @Id;
-                            ";
+                --3
+                DELETE FROM actor
+                WHERE actor_id = @Id;
+                ";
             
             var multi = await connection.QueryMultipleAsync(
                 new CommandDefinition(sql, new { Id = id }, transaction, cancellationToken: ct)
