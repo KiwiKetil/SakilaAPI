@@ -4,6 +4,7 @@ using SakilaAPI.Models;
 using SakilaAPI.Repositories.Interfaces;
 using SakilaAPI.Dtos.Actor;
 using SakilaAPI.Models.Enums;
+using SakilaAPI.DTOs.Actor;
 
 namespace SakilaAPI.Repositories;
 
@@ -65,6 +66,11 @@ public class ActorRepositoryEF : IActorRepository
     }
 
     public Task<Actor?> DeleteActorAsync(ushort id, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Actor?> UpdateActorAsync(ushort id, ActorUpdateDto dto, CancellationToken ct)
     {
         throw new NotImplementedException();
     }

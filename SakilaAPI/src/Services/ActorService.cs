@@ -53,4 +53,10 @@ public class ActorService : IActorService
         var res = await _actorRepository.DeleteActorAsync(id, ct);
         return res != null ? _actorMapper.MapToDto(res): null;        
     }
+
+    public async Task<ActorDto?> UpdateActorAsync(ushort id, ActorUpdateDto dto, CancellationToken ct)
+    {
+        var res =  await _actorRepository.UpdateActorAsync(id, dto, ct); 
+        return res != null ? _actorMapper.MapToDto(res) : null;
+    }
 }
