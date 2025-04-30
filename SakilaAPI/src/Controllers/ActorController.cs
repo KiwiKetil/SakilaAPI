@@ -61,6 +61,15 @@ public class ActorController : ControllerBase
         _logger.LogInformation("Deleting actor by id");
 
         var res = await _actorService.DeleteActorAsync(id, ct);
-        return res != null ? Ok(res) : NotFound("Delete unsuccesful - actor id not found");
+        return res != null ? Ok(res) : NotFound("Delete unsuccesful - actor not found");
+    }
+
+    [HttpPut("{id}", Name = "UpdateActor")]
+    public async Task<ActionResult<ActorUpdateDto>> UpdateActor(ushort id, [FromBody] ActorUpdateDto dto, CancellationToken ct) // test uten FROMBODY også, pga ikke har [ApiController]
+    {
+        _logger.LogInformation("Updating actor by id");
+
+        var res = await _actorService.UpdateActorAsync(id, dto,  ct);
+        return res != null ? Ok(res) : NotFound("Update unsuccesful - actor not found");
     }
 }

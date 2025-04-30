@@ -34,7 +34,7 @@ public static class ServiceCollectionExtensions
         // Services
         services.AddScoped<IActorService, ActorService>();
 
-        // Mappers are found in WebAppExtensions folder
+        // Mappers are added through WebAppExtension in the Extensions folder
         
         // Repositories // Change imlementation to use desired ORM, MicroORM
         // services.AddScoped<IActorRepository, ActorRepositoryEF>();

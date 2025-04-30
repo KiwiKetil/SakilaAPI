@@ -4,6 +4,9 @@ using SakilaAPI.Models;
 using SakilaAPI.Models.Enums;
 using SakilaAPI.Repositories.Interfaces;
 using SakilaAPI.DB.Interfaces;
+using SakilaAPI.DTOs.Actor;
+using System.Runtime.CompilerServices;
+using System.Globalization;
 
 namespace SakilaAPI.Repositories;
 
@@ -20,14 +23,9 @@ public class ActorRepositoryDapper : IActorRepository
 
     public async Task<IEnumerable<Actor>> GetActorsAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Retrieving actors using Dapper");
+        _logger.LogInformation("Retrieving actors using Dapper");   
 
-        var parameters = new DynamicParameters();
-        var skipNumber = (page -1) * pageSize;        
-        parameters.Add("PageSize", pageSize);
-        parameters.Add("Skipnumber", skipNumber);
-
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
 
         var sql = @"
                     SELECT 
@@ -47,6 +45,11 @@ public class ActorRepositoryDapper : IActorRepository
                     OFFSET @SkipNumber
                     ";
 
+        var parameters = new DynamicParameters();
+        var skipNumber = (page -1) * pageSize;        
+        parameters.Add("PageSize", pageSize);
+        parameters.Add("Skipnumber", skipNumber);
+
         var cmd = new CommandDefinition
         (
             commandText: sql,
@@ -63,7 +66,7 @@ public class ActorRepositoryDapper : IActorRepository
     {
         _logger.LogInformation("Retrieving actor by Id using Dapper");
 
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
 
         var sql = @"
                     SELECT
@@ -96,7 +99,7 @@ public class ActorRepositoryDapper : IActorRepository
     {
         _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync();      
+        await using var connection = await _dbConnectionFactory.CreateConnectionAsync();      
 
         var sql = @"
                     SELECT 
@@ -141,14 +144,14 @@ public class ActorRepositoryDapper : IActorRepository
     {
         _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
    
         var sql = @"
                     SELECT 
                         CONCAT(
                             UPPER(SUBSTRING(a.first_name, 1, 1)),
                             LOWER(SUBSTRING(a.first_name, 2))
-                           ) AS FirstName,
+                            ) AS FirstName,
                         CONCAT(
                             UPPER(SUBSTRING(a.last_name, 1, 1)),
                             LOWER(SUBSTRING(a.last_name, 2))
@@ -190,46 +193,141 @@ public class ActorRepositoryDapper : IActorRepository
 
     public async Task<Actor?> DeleteActorAsync(ushort id, CancellationToken ct)
     {
-        _logger.LogInformation("Deleting actor using Dapper (SELECT-then-DELETE)");
+        _logger.LogInformation("Deleting actor using Dapper");
 
-        using var connection  = await _dbConnectionFactory.CreateConnectionAsync();
-        using var transaction = await connection.BeginTransactionAsync(ct);
+        await using var connection  = await _dbConnectionFactory.CreateConnectionAsync();
+        await using var transaction = await connection.BeginTransactionAsync(ct);
+        try
+        {
+            const string sql = @" 
+                            --1       
+                                SELECT
+                                    actor_id   AS ActorId,
+                                    first_name AS FirstName,
+                                    last_name  AS LastName,
+                                    last_update AS LastUpdate
+                                FROM actor
+                                WHERE actor_id = @Id;
 
-       const string sql = @" 
-       --1       
-        SELECT
-            actor_id   AS ActorId,
-            first_name AS FirstName,
-            last_name  AS LastName,
-            last_update AS LastUpdate
-        FROM actor
-        WHERE actor_id = @Id;
+                            --2
+                                DELETE FROM film_actor        
+                                WHERE actor_id = @Id;
 
-       --2
-        DELETE FROM film_actor        
-        WHERE actor_id = @Id;
-
-        --3
-        DELETE FROM actor
-        WHERE actor_id = @Id;
-    ";
+                                --3
+                                DELETE FROM actor
+                                WHERE actor_id = @Id;
+                            ";
+            
+            var multi = await connection.QueryMultipleAsync(
+                new CommandDefinition(sql, new { Id = id }, transaction, cancellationToken: ct)
+            );
         
-        var multi = await connection.QueryMultipleAsync(
-            new CommandDefinition(sql, new { Id = id }, transaction, cancellationToken: ct)
-        );
-    
-        var actor = await multi.ReadSingleOrDefaultAsync<Actor>();
-        
-        if (actor is not null)
+            var actor = await multi.ReadSingleOrDefaultAsync<Actor>();
+            
+            if (actor is null)
+            {
+                await transaction.RollbackAsync(ct);
+                return null;
+            }               
+
             await transaction.CommitAsync(ct);
-        else
+            return actor;
+        }
+        catch
+        {
             await transaction.RollbackAsync(ct);
-
-        return actor;
+            throw;
+        }
     }
-   
+  
+    public async Task<Actor?> UpdateActorAsync(
+    ushort id,
+    ActorUpdateDto dto,
+    CancellationToken ct = default)
+    {
+        await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        await using var transaction = await connection.BeginTransactionAsync(ct);
 
-    // Update 
+        try
+        {           
+            var setClauses = new List<string>();
+            var parameters = new DynamicParameters();
 
-    // create
+            if (dto.FirstName is not null)
+            {
+                setClauses.Add("first_name = @FirstName");
+                parameters.Add("FirstName", dto.FirstName);
+            }
+            if (dto.LastName is not null)
+            {
+                setClauses.Add("last_name  = @LastName");
+                parameters.Add("LastName", dto.LastName);
+            }
+
+            parameters.Add("ActorId", id);
+           
+            if (setClauses.Count > 0)
+            {
+                var updateSql = $@"
+                    UPDATE actor
+                        SET {string.Join(", ", setClauses)}
+                        WHERE actor_id = @ActorId;";
+                        
+                await connection.ExecuteAsync(
+                    updateSql,
+                    parameters,
+                    transaction: transaction
+                    );
+            }
+         
+            const string selectSql = @"
+                SELECT
+                    actor_id AS ActorId,
+                    first_name AS FirstName,
+                    last_name  AS LastName
+                FROM actor
+                WHERE actor_id = @ActorId
+                ";
+
+            var actor = await connection
+                .QuerySingleOrDefaultAsync<Actor>(
+                    selectSql,
+                    new { ActorId = id },
+                    transaction: transaction
+                    );              
+
+            if(actor is null)
+            return null;
+
+            await transaction.CommitAsync(ct);
+
+            var ti = CultureInfo.InvariantCulture.TextInfo;
+            actor.FirstName = ti.ToTitleCase(actor.FirstName.ToLowerInvariant());
+            actor.LastName  = ti.ToTitleCase(actor.LastName.ToLowerInvariant()); 
+            
+            return actor;
+        }
+        catch
+        {
+            await transaction.RollbackAsync(ct);
+            throw;
+        }
+    }       
 }
+
+ 
+
+
+
+        // Grid - using multi -> if just one roundtrip is important (one roundtrip)
+
+        // UOW using interface implemented in Servicelayer or Repolayer -> if several repos involved (will have more than one roundtrip)
+
+        // Simple transaction in repolayer -> If several queries to same repo / same table table (will have more than 1 roundtrip)        
+
+        // stored procedure -> When you need server-side performance for complex Joins, multi inputs, -updates, -deletes. reach for a stored procedure when you really need 
+        // server-side horsepower, security, or atomic multi-step SQL batched into one call. (one roundtrip)
+
+        // create / add
+
+        // validation
