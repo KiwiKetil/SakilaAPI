@@ -39,19 +39,21 @@ public class ActorRepositoryDapper : IActorRepository
                     LOWER(SUBSTRING(last_name, 2))
                     ) AS LastName,
                 last_update AS LastUpdate
-            FROM Actor
-            ORDER BY actor_id
+            FROM 
+                Actor
+            ORDER BY
+                actor_id
             LIMIT @PageSize
             OFFSET @SkipNumber
             ";
 
         var parameters = new DynamicParameters();
+
         var skipNumber = (page -1) * pageSize;        
         parameters.Add("PageSize", pageSize);
         parameters.Add("Skipnumber", skipNumber);
 
-        var cmd = new CommandDefinition
-        (
+        var cmd = new CommandDefinition(
             commandText: sql,
             parameters : parameters,
             cancellationToken : cancellationToken            
@@ -80,12 +82,13 @@ public class ActorRepositoryDapper : IActorRepository
                     LOWER(SUBSTRING(last_name, 2))
                     ) AS LastName,
                 last_update AS LastUpdate
-            FROM Actor
-            WHERE actor_id = @Id
-            ";
+            FROM 
+                Actor
+            WHERE
+                actor_id = @Id
+                ";
 
-        var cmd = new CommandDefinition
-        (
+        var cmd = new CommandDefinition(
             commandText: sql,
             parameters: new { Id = id },  
             cancellationToken: cancellationToken        
@@ -129,8 +132,7 @@ public class ActorRepositoryDapper : IActorRepository
             CategoryName = category.ToString()
         };
 
-        var cmd = new CommandDefinition
-        (
+        var cmd = new CommandDefinition(
             commandText: sql,
             parameters: parameters,
             cancellationToken: cancellationToken        
@@ -180,8 +182,7 @@ public class ActorRepositoryDapper : IActorRepository
             LastName = lastName
         };
                  
-        var cmd = new CommandDefinition
-        (
+        var cmd = new CommandDefinition(
             commandText: sql,
             parameters: parameters,
             cancellationToken: cancellationToken
@@ -200,27 +201,34 @@ public class ActorRepositoryDapper : IActorRepository
         try
         {
             const string sql = @" 
-                --1       
+                -- 1       
                 SELECT
-                    actor_id   AS ActorId,
+                    actor_id AS ActorId,
                     first_name AS FirstName,
-                    last_name  AS LastName,
+                    last_name AS LastName,
                     last_update AS LastUpdate
-                FROM actor
-                WHERE actor_id = @Id;
+                FROM 
+                    actor
+                WHERE
+                    actor_id = @Id;
 
-                --2
+                -- 2
                 DELETE FROM film_actor        
                 WHERE actor_id = @Id;
 
-                --3
+                -- 3
                 DELETE FROM actor
                 WHERE actor_id = @Id;
                 ";
+
+                var cmd = new CommandDefinition(
+                    sql,
+                    new { Id = id }, 
+                    transaction, 
+                    cancellationToken: ct
+                );
             
-            var multi = await connection.QueryMultipleAsync(
-                new CommandDefinition(sql, new { Id = id }, transaction, cancellationToken: ct)
-            );
+            var multi = await connection.QueryMultipleAsync(cmd);
         
             var actor = await multi.ReadSingleOrDefaultAsync<Actor>();
             
@@ -240,10 +248,7 @@ public class ActorRepositoryDapper : IActorRepository
         }
     }
   
-    public async Task<Actor?> UpdateActorAsync(
-    ushort id,
-    ActorUpdateDto dto,
-    CancellationToken ct = default)
+    public async Task<Actor?> UpdateActorAsync(ushort id, ActorUpdateDto dto, CancellationToken ct = default)
     {
         await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync(ct);
@@ -272,12 +277,15 @@ public class ActorRepositoryDapper : IActorRepository
                     UPDATE actor
                         SET {string.Join(", ", setClauses)}
                         WHERE actor_id = @ActorId;";
-                        
-                await connection.ExecuteAsync(
+
+                var updateCmd = new CommandDefinition(
                     updateSql,
                     parameters,
-                    transaction: transaction
-                    );
+                    transaction: transaction,
+                    cancellationToken:ct                    
+                );
+
+                await connection.ExecuteAsync(updateCmd);
             }
          
             const string selectSql = @"
@@ -285,16 +293,19 @@ public class ActorRepositoryDapper : IActorRepository
                     actor_id AS ActorId,
                     first_name AS FirstName,
                     last_name  AS LastName
-                FROM actor
-                WHERE actor_id = @ActorId
+                FROM
+                    actor
+                WHERE
+                     actor_id = @ActorId
                 ";
 
-            var actor = await connection
-                .QuerySingleOrDefaultAsync<Actor>(
+                var selectCmd = new CommandDefinition(
                     selectSql,
                     new { ActorId = id },
                     transaction: transaction
-                    );              
+                );
+
+            var actor = await connection.QuerySingleOrDefaultAsync<Actor>(selectCmd);            
 
             if(actor is null)
             return null;
@@ -315,19 +326,15 @@ public class ActorRepositoryDapper : IActorRepository
     }       
 }
 
- 
+// Grid - using multi -> if just one roundtrip is important (one roundtrip)
 
+// UOW using interface implemented in Servicelayer or Repolayer -> if several repos involved (will have more than one roundtrip)
 
+// Simple transaction in repolayer -> If several queries to same repo / same table table (will have more than 1 roundtrip)        
 
-        // Grid - using multi -> if just one roundtrip is important (one roundtrip)
+// stored procedure -> When you need server-side performance for complex Joins, multi inputs, -updates, -deletes. reach for a stored procedure when you really need 
+// server-side horsepower, security, or atomic multi-step SQL batched into one call. (one roundtrip)
 
-        // UOW using interface implemented in Servicelayer or Repolayer -> if several repos involved (will have more than one roundtrip)
+// create / add
 
-        // Simple transaction in repolayer -> If several queries to same repo / same table table (will have more than 1 roundtrip)        
-
-        // stored procedure -> When you need server-side performance for complex Joins, multi inputs, -updates, -deletes. reach for a stored procedure when you really need 
-        // server-side horsepower, security, or atomic multi-step SQL batched into one call. (one roundtrip)
-
-        // create / add
-
-        // validation
+// validation
