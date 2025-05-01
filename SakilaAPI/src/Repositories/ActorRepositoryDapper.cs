@@ -98,7 +98,7 @@ public class ActorRepositoryDapper : IActorRepository
         return actor;
     }
     
-    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByCategoryAsync(FilmCategoryEnum category, CancellationToken cancellationToken) // add pagination
     {
         _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
@@ -199,7 +199,7 @@ public class ActorRepositoryDapper : IActorRepository
         await using var connection  = await _dbConnectionFactory.CreateConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync(ct);
         try
-        {
+        {                                   // Change to simple transaction - 
             const string sql = @" 
                 -- 1       
                 SELECT
@@ -248,7 +248,7 @@ public class ActorRepositoryDapper : IActorRepository
         }
     }
   
-    public async Task<Actor?> UpdateActorAsync(ushort id, ActorUpdateDto dto, CancellationToken ct = default)
+    public async Task<Actor?> UpdateActorAsync(ushort id, Actor actor, CancellationToken ct = default)
     {
         await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync(ct);
@@ -258,15 +258,26 @@ public class ActorRepositoryDapper : IActorRepository
             var setClauses = new List<string>();
             var parameters = new DynamicParameters();
 
-            if (dto.FirstName is not null)
+        /*     if (!string.IsNullOrWhiteSpace(actor.FirstName)
+            && !actor.FirstName.Equals("String", StringComparison.OrdinalIgnoreCase)) // flytt logikk fluentvalidation?
             {
-                setClauses.Add("first_name = @FirstName");
-                parameters.Add("FirstName", dto.FirstName);
+                
             }
-            if (dto.LastName is not null)
+            if (!string.IsNullOrWhiteSpace(actor.LastName)
+            && !actor.LastName.Equals("String", StringComparison.OrdinalIgnoreCase))  // flytt logikk fluentvalidation?
             {
-                setClauses.Add("last_name  = @LastName");
-                parameters.Add("LastName", dto.LastName);
+               
+            } */
+            if (!string.IsNullOrWhiteSpace(actor.FirstName))
+            {
+            setClauses.Add("first_name = @FirstName");
+            parameters.Add("FirstName", actor.FirstName);
+            }
+
+            if (!string.IsNullOrWhiteSpace(actor.LastName))
+            {
+            setClauses.Add("last_name  = @LastName");
+            parameters.Add("LastName", actor.LastName);
             }
 
             parameters.Add("ActorId", id);
@@ -305,18 +316,18 @@ public class ActorRepositoryDapper : IActorRepository
                     transaction: transaction
                 );
 
-            var actor = await connection.QuerySingleOrDefaultAsync<Actor>(selectCmd);            
+            var updatedActor = await connection.QuerySingleOrDefaultAsync<Actor>(selectCmd);            
 
-            if(actor is null)
+            if(updatedActor is null)
             return null;
 
             await transaction.CommitAsync(ct);
 
             var ti = CultureInfo.InvariantCulture.TextInfo;
-            actor.FirstName = ti.ToTitleCase(actor.FirstName.ToLowerInvariant());
-            actor.LastName  = ti.ToTitleCase(actor.LastName.ToLowerInvariant()); 
+            updatedActor.FirstName = ti.ToTitleCase(updatedActor.FirstName.ToLowerInvariant()); //flytt
+            updatedActor.LastName  = ti.ToTitleCase(updatedActor.LastName.ToLowerInvariant()); 
             
-            return actor;
+            return updatedActor;
         }
         catch
         {

@@ -70,7 +70,7 @@ public class ActorRepositoryEF : IActorRepository
         throw new NotImplementedException();
     }
 
-    public Task<Actor?> UpdateActorAsync(ushort id, ActorUpdateDto dto, CancellationToken ct)
+    public Task<Actor?> UpdateActorAsync(ushort id, Actor actor, CancellationToken ct)
     {
         throw new NotImplementedException();
     }

@@ -8,6 +8,10 @@ using SakilaAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using SakilaAPI.DB.Interfaces;
 using SakilaAPI.DB;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using FluentValidation.Resources;
+using System.Globalization;
 
 namespace SakilaAPI.Extensions;
 
@@ -35,6 +39,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IActorService, ActorService>();
 
         // Mappers are added through WebAppExtension in the Extensions folder
+
+        // FluentValidation
+        services.AddValidatorsFromAssemblyContaining<ActorService>();
+        services.AddFluentValidationAutoValidation(cfg => cfg.DisableDataAnnotationsValidation = true);
+        ValidatorOptions.Global.LanguageManager = new LanguageManager{
+            Culture = new CultureInfo("en")
+        };
         
         // Repositories // Change imlementation to use desired ORM, MicroORM
         // services.AddScoped<IActorRepository, ActorRepositoryEF>();
