@@ -38,7 +38,7 @@ public class ActorController : ControllerBase
     }
 
     [HttpGet("categories", Name = "GetActorsFilmAndCategory")]
-    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByCategory([FromQuery]FilmCategoryEnum category,  CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ActorFilmCategoryDto>>> GetActorFilmsByCategory([FromQuery]FilmCategoryEnum category,  CancellationToken cancellationToken) // add pagination
     {
         _logger.LogInformation("Retrieving actors by films and categories"); 
         

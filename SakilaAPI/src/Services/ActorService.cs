@@ -12,11 +12,13 @@ public class ActorService : IActorService
 {
     private readonly IActorRepository _actorRepository;
     private readonly IMapper<Actor, ActorDto> _actorMapper;
+    private readonly IMapper<Actor, ActorUpdateDto> _actorUpdateMapper;
 
-    public ActorService(IActorRepository actorRepository, IMapper<Actor, ActorDto> actorMapper)
+    public ActorService(IActorRepository actorRepository, IMapper<Actor, ActorDto> actorMapper,  IMapper<Actor, ActorUpdateDto> actorUpdateMapper)
     {
         _actorRepository = actorRepository;
         _actorMapper = actorMapper;
+        _actorUpdateMapper = actorUpdateMapper;
     } 
 
     public async Task<IEnumerable<ActorDto>> GetActorsAsync(int page, int pageSize, CancellationToken cancellationToken)
@@ -56,7 +58,8 @@ public class ActorService : IActorService
 
     public async Task<ActorDto?> UpdateActorAsync(ushort id, ActorUpdateDto dto, CancellationToken ct)
     {
-        var res =  await _actorRepository.UpdateActorAsync(id, dto, ct); 
+        var actor = _actorUpdateMapper.MapToEntity(dto);
+        var res =  await _actorRepository.UpdateActorAsync(id, actor, ct); 
         return res != null ? _actorMapper.MapToDto(res) : null;
     }
 }
