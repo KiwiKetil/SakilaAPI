@@ -257,17 +257,7 @@ public class ActorRepositoryDapper : IActorRepository
         {           
             var setClauses = new List<string>();
             var parameters = new DynamicParameters();
-
-        /*     if (!string.IsNullOrWhiteSpace(actor.FirstName)
-            && !actor.FirstName.Equals("String", StringComparison.OrdinalIgnoreCase)) // flytt logikk fluentvalidation?
-            {
-                
-            }
-            if (!string.IsNullOrWhiteSpace(actor.LastName)
-            && !actor.LastName.Equals("String", StringComparison.OrdinalIgnoreCase))  // flytt logikk fluentvalidation?
-            {
-               
-            } */
+      
             if (!string.IsNullOrWhiteSpace(actor.FirstName))
             {
             setClauses.Add("first_name = @FirstName");
@@ -321,12 +311,7 @@ public class ActorRepositoryDapper : IActorRepository
             if(updatedActor is null)
             return null;
 
-            await transaction.CommitAsync(ct);
-
-            var ti = CultureInfo.InvariantCulture.TextInfo;
-            updatedActor.FirstName = ti.ToTitleCase(updatedActor.FirstName.ToLowerInvariant()); //flytt
-            updatedActor.LastName  = ti.ToTitleCase(updatedActor.LastName.ToLowerInvariant()); 
-            
+            await transaction.CommitAsync(ct);           
             return updatedActor;
         }
         catch
@@ -337,15 +322,4 @@ public class ActorRepositoryDapper : IActorRepository
     }       
 }
 
-// Grid - using multi -> if just one roundtrip is important (one roundtrip)
-
-// UOW using interface implemented in Servicelayer or Repolayer -> if several repos involved (will have more than one roundtrip)
-
-// Simple transaction in repolayer -> If several queries to same repo / same table table (will have more than 1 roundtrip)        
-
-// stored procedure -> When you need server-side performance for complex Joins, multi inputs, -updates, -deletes. reach for a stored procedure when you really need 
-// server-side horsepower, security, or atomic multi-step SQL batched into one call. (one roundtrip)
-
 // create / add
-
-// validation
