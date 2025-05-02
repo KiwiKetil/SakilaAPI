@@ -311,12 +311,7 @@ public class ActorRepositoryDapper : IActorRepository
             if(updatedActor is null)
             return null;
 
-            await transaction.CommitAsync(ct);
-
-            var ti = CultureInfo.InvariantCulture.TextInfo;
-            updatedActor.FirstName = ti.ToTitleCase(updatedActor.FirstName.ToLowerInvariant()); //flytt
-            updatedActor.LastName  = ti.ToTitleCase(updatedActor.LastName.ToLowerInvariant()); 
-            
+            await transaction.CommitAsync(ct);           
             return updatedActor;
         }
         catch
