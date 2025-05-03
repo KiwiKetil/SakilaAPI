@@ -18,4 +18,3 @@ public class ActorUpdateValidator : AbstractValidator<ActorUpdateDto>
         .NotEqual("string", StringComparer.OrdinalIgnoreCase);
     }
 }
-
