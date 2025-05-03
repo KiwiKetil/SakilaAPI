@@ -47,9 +47,9 @@ public class ActorRepositoryDapper : IActorRepository
             OFFSET @SkipNumber
             ";
 
-        var parameters = new DynamicParameters();
+        var skipNumber = (page -1) * pageSize; 
 
-        var skipNumber = (page -1) * pageSize;        
+        var parameters = new DynamicParameters();              // or just use anon obj?
         parameters.Add("PageSize", pageSize);
         parameters.Add("Skipnumber", skipNumber);
 
@@ -103,11 +103,11 @@ public class ActorRepositoryDapper : IActorRepository
         _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
         await using var connection = await _dbConnectionFactory.CreateConnectionAsync();      
-
+                                    // Trenger ikke lenger concat pga actormapper?
         const string sql = @"
             SELECT 
                 CONCAT(
-                    UPPER(SUBSTRING(a.first_name, 1, 1)),
+                    UPPER(SUBSTRING(a.first_name, 1, 1)),  
                     LOWER(SUBSTRING(a.first_name, 2))
                     ) AS FirstName,
                 CONCAT(
@@ -199,7 +199,7 @@ public class ActorRepositoryDapper : IActorRepository
         await using var connection  = await _dbConnectionFactory.CreateConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync(ct);
         try
-        {                                   // Change to simple transaction - 
+        {                                   // Change to simple transaction - why??
             const string sql = @" 
                 -- 1       
                 SELECT
@@ -254,40 +254,27 @@ public class ActorRepositoryDapper : IActorRepository
         await using var transaction = await connection.BeginTransactionAsync(ct);
 
         try
-        {           
-            var setClauses = new List<string>();
-            var parameters = new DynamicParameters();
-      
-            if (!string.IsNullOrWhiteSpace(actor.FirstName))
+        {                                          
+            const string updateSql = @"
+                UPDATE actor
+                SET 
+                    first_name = @FirstName,
+                    last_name = @LastName
+                WHERE actor_id = @ActorId";
+       
+            var affected = await connection.ExecuteAsync( new CommandDefinition(
+                updateSql,
+                new { actor.FirstName, actor.LastName, ActorId = id },
+                transaction: transaction,
+                cancellationToken:ct
+            ));           
+            
+            if(affected != 1)
             {
-            setClauses.Add("first_name = @FirstName");
-            parameters.Add("FirstName", actor.FirstName);
-            }
-
-            if (!string.IsNullOrWhiteSpace(actor.LastName))
-            {
-            setClauses.Add("last_name  = @LastName");
-            parameters.Add("LastName", actor.LastName);
-            }
-
-            parameters.Add("ActorId", id);
-           
-            if (setClauses.Count > 0)
-            {
-                var updateSql = $@"
-                    UPDATE actor
-                        SET {string.Join(", ", setClauses)}
-                        WHERE actor_id = @ActorId;";
-
-                var updateCmd = new CommandDefinition(
-                    updateSql,
-                    parameters,
-                    transaction: transaction,
-                    cancellationToken:ct                    
-                );
-
-                await connection.ExecuteAsync(updateCmd);
-            }
+                _logger.LogWarning("UpdateActorAsync({ActorId}) affected {Rows} rows", id, affected);
+                await transaction.RollbackAsync(ct);
+                return null;
+            }             
          
             const string selectSql = @"
                 SELECT
@@ -298,18 +285,15 @@ public class ActorRepositoryDapper : IActorRepository
                     actor
                 WHERE
                      actor_id = @ActorId
-                ";
+                ";              
 
-                var selectCmd = new CommandDefinition(
+            var updatedActor = await connection
+                .QuerySingleOrDefaultAsync<Actor>(new CommandDefinition(
                     selectSql,
                     new { ActorId = id },
-                    transaction: transaction
-                );
-
-            var updatedActor = await connection.QuerySingleOrDefaultAsync<Actor>(selectCmd);            
-
-            if(updatedActor is null)
-            return null;
+                    transaction: transaction,
+                    cancellationToken:ct 
+                ));                     
 
             await transaction.CommitAsync(ct);           
             return updatedActor;
