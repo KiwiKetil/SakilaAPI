@@ -7,6 +7,7 @@ using SakilaAPI.DB.Interfaces;
 using SakilaAPI.DTOs.Actor;
 using System.Runtime.CompilerServices;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace SakilaAPI.Repositories;
 
@@ -94,7 +95,7 @@ public class ActorRepositoryDapper : IActorRepository
             cancellationToken: cancellationToken        
         );
 
-        var actor = await connection.QueryFirstOrDefaultAsync<Actor>(cmd);
+        var actor = await connection.QuerySingleOrDefaultAsync<Actor>(cmd);
         return actor;
     }
     
@@ -198,45 +199,69 @@ public class ActorRepositoryDapper : IActorRepository
 
         await using var connection  = await _dbConnectionFactory.CreateConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync(ct);
+
         try
-        {                                   // Change to simple transaction - why??
-            const string sql = @" 
-                -- 1       
+        {                               
+            const string selectSql = @"
                 SELECT
-                    actor_id AS ActorId,
-                    first_name AS FirstName,
-                    last_name AS LastName,
-                    last_update AS LastUpdate
-                FROM 
-                    actor
-                WHERE
-                    actor_id = @Id;
-
-                -- 2
-                DELETE FROM film_actor        
-                WHERE actor_id = @Id;
-
-                -- 3
-                DELETE FROM actor
-                WHERE actor_id = @Id;
+                        actor_id AS ActorId,
+                        first_name AS FirstName,
+                        last_name AS LastName,
+                        last_update AS LastUpdate
+                    FROM 
+                        actor
+                    WHERE
+                        actor_id = @Id;
                 ";
 
-                var cmd = new CommandDefinition(
-                    sql,
-                    new { Id = id }, 
-                    transaction, 
-                    cancellationToken: ct
-                );
-            
-            var multi = await connection.QueryMultipleAsync(cmd);
-        
-            var actor = await multi.ReadSingleOrDefaultAsync<Actor>();
-            
-            if (actor is null)
-            {
-                await transaction.RollbackAsync(ct);
-                return null;
-            }               
+                var idParameter = new { Id = id};
+
+                var actor = await connection.QuerySingleOrDefaultAsync<Actor>(new CommandDefinition(
+                    selectSql,
+                    idParameter,
+                    transaction,
+                    cancellationToken : ct
+                )); 
+
+                if (actor is null)
+                {
+                    await transaction.RollbackAsync(ct);
+                    return null;
+                }               
+
+                const string deleteFilmActorSql = @"
+                DELETE
+                    FROM film_actor        
+                WHERE 
+                    actor_id = @Id;               
+                ";
+
+                await connection.ExecuteAsync(new CommandDefinition( 
+                    deleteFilmActorSql,
+                    idParameter,
+                    transaction,
+                    cancellationToken : ct
+                ));               
+
+                const string deleteActorSql = @"
+                DELETE
+                    FROM actor
+                WHERE
+                    actor_id = @Id;
+                ";    
+
+                var success = await connection.ExecuteAsync(new CommandDefinition(
+                    deleteActorSql,
+                    idParameter,
+                    transaction,
+                    cancellationToken : ct
+                ));                   
+           
+                if (success != 1)
+                {
+                    await transaction.RollbackAsync(ct);
+                    return null;
+                }                        
 
             await transaction.CommitAsync(ct);
             return actor;
