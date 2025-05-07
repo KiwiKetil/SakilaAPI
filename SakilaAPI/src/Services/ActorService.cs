@@ -13,12 +13,14 @@ public class ActorService : IActorService
     private readonly IActorRepository _actorRepository;
     private readonly IMapper<Actor, ActorDto> _actorMapper;
     private readonly IMapper<Actor, ActorUpdateDto> _actorUpdateMapper;
+    private readonly IMapper<Actor, ActorRegistrationDto> _actorRegistrationMapper;
 
-    public ActorService(IActorRepository actorRepository, IMapper<Actor, ActorDto> actorMapper,  IMapper<Actor, ActorUpdateDto> actorUpdateMapper)
+    public ActorService(IActorRepository actorRepository, IMapper<Actor, ActorDto> actorMapper,  IMapper<Actor, ActorUpdateDto> actorUpdateMapper, IMapper<Actor, ActorRegistrationDto> actorRegistrationMapper)
     {
         _actorRepository = actorRepository;
         _actorMapper = actorMapper;
         _actorUpdateMapper = actorUpdateMapper;
+        _actorRegistrationMapper = actorRegistrationMapper;
     } 
 
     public async Task<IEnumerable<ActorDto>> GetActorsAsync(int page, int pageSize, CancellationToken cancellationToken)
@@ -60,6 +62,13 @@ public class ActorService : IActorService
     {
         var actor = _actorUpdateMapper.MapToEntity(dto);
         var res =  await _actorRepository.UpdateActorAsync(id, actor, ct); 
+        return res != null ? _actorMapper.MapToDto(res) : null;
+    }
+
+    public async Task<ActorDto?> RegisterActorAsync(ActorRegistrationDto dto, CancellationToken ct)
+    {
+        var actor = _actorRegistrationMapper.MapToEntity(dto);
+        var res = await _actorRepository.RegisterActorAsync(actor, ct);
         return res != null ? _actorMapper.MapToDto(res) : null;
     }
 }
