@@ -50,7 +50,7 @@ public class ActorRepositoryDapper : IActorRepository
 
         var skipNumber = (page -1) * pageSize; 
 
-        var parameters = new DynamicParameters();              // or just use anon obj?
+        var parameters = new DynamicParameters();          
         parameters.Add("PageSize", pageSize);
         parameters.Add("Skipnumber", skipNumber);
 
@@ -275,6 +275,8 @@ public class ActorRepositoryDapper : IActorRepository
   
     public async Task<Actor?> UpdateActorAsync(ushort id, Actor actor, CancellationToken ct = default)
     {
+        _logger.LogInformation("Updating actor using Dapper");
+
         await using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync(ct);
 
@@ -328,7 +330,44 @@ public class ActorRepositoryDapper : IActorRepository
             await transaction.RollbackAsync(ct);
             throw;
         }
-    }       
-}
+    }    
 
-// create / add
+    public async Task<Actor?> RegisterActorAsync(Actor actor, CancellationToken ct)     // husk validering dto
+    {
+        _logger.LogInformation("Registering actor using Dapper"); 
+
+        await using var connection = await _dbConnectionFactory.CreateConnectionAsync();      
+        
+        const string registerSql = @"
+            INSERT INTO 
+                Actor (first_name, last_name)
+            VALUES
+                (@FirstName, @LastName);          
+        ";
+
+        var parameters = new { actor.FirstName, actor.LastName};
+
+        await connection.ExecuteScalarAsync<int>(new CommandDefinition(registerSql, parameters : parameters, cancellationToken : ct));                   
+
+        const string lastIdSql = @"
+            SELECT LAST_INSERT_ID()
+        ";
+
+        var newId = await connection.ExecuteScalarAsync<int>( new CommandDefinition(lastIdSql, cancellationToken : ct));       
+       
+        const string selectSql = @"
+            SELECT
+                actor_id AS ActorId,
+                first_name AS FirstName,
+                last_name AS LastName,
+                last_update AS LastUpdate
+            FROM
+                Actor
+            WHERE 
+                actor_id = @Id
+        ";
+
+        var registeredActor = await connection.QuerySingleOrDefaultAsync<Actor>(new CommandDefinition(selectSql, parameters : new  {Id = newId}, cancellationToken : ct));
+        return registeredActor;
+    }    
+}

@@ -14,4 +14,5 @@ public interface IActorService
     Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, int page, int pageSize, CancellationToken cancellationToken);
     Task<ActorDto?> DeleteActorAsync(ushort id, CancellationToken ct);
     Task<ActorDto?> UpdateActorAsync(ushort id, ActorUpdateDto dto, CancellationToken ct);
+    Task<ActorDto?> RegisterActorAsync(ActorRegistrationDto dto, CancellationToken ct);
 }
