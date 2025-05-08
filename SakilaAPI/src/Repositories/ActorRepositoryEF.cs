@@ -47,7 +47,7 @@ public class ActorRepositoryEF : IActorRepository
     {
         _logger.LogInformation("Retrieveing actors by film and category using EF");
 
-        var raw = await _sakilaContext.FilmActors
+        var raw = _sakilaContext.FilmActors
             .AsNoTracking()                                    
             .Where(fa => fa.Film.FilmCategories                
             .Any(fc => fc.CategoryId == (int)category))   
@@ -55,9 +55,13 @@ public class ActorRepositoryEF : IActorRepository
                 fa.Actor.FirstName,
                 fa.Actor.LastName,
                 fa.Film.Title                
-            }).ToListAsync(cancellationToken);         
+            });//.ToListAsync(cancellationToken);         
 
-        return raw.Select(x => new ActorFilmCategoryDto(
+            System.Console.WriteLine(raw.ToQueryString());
+
+            var rr = await raw.ToListAsync(cancellationToken);
+
+        return rr.Select(x => new ActorFilmCategoryDto(
             StringHelpers.Capitalize(x.FirstName),
             StringHelpers.Capitalize(x.LastName),
             StringHelpers.Capitalize(x.Title),
