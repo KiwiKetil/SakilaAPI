@@ -4,6 +4,6 @@ public record ActorFilmCategoryDto
 (
     string FirstName,
     string LastName,
-    string Film,
+    string FilmTitle,
     string Category
 );

@@ -48,8 +48,8 @@ public static class ServiceCollectionExtensions
         };
         
         // Repositories // Change imlementation to use desired ORM, MicroORM
-        // services.AddScoped<IActorRepository, ActorRepositoryEF>();
-        services.AddScoped<IActorRepository, ActorRepositoryDapper>();
+        services.AddScoped<IActorRepository, ActorRepositoryEF>();
+        // services.AddScoped<IActorRepository, ActorRepositoryDapper>();
 
         // MySQLConnector for Dapper
         services.AddScoped<IDbConnectionFactory>(sp =>

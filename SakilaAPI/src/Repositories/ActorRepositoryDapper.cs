@@ -106,7 +106,7 @@ public class ActorRepositoryDapper : IActorRepository
                 CONCAT(
                     UPPER(SUBSTRING(f.title, 1, 1)),
                     LOWER(SUBSTRING(f.title, 2))
-                    ) AS Film,                      
+                    ) AS FilmTitle,                      
                 @CategoryName AS Category
             FROM film_actor fa
             JOIN actor a ON fa.actor_id = a.actor_id
@@ -150,7 +150,7 @@ public class ActorRepositoryDapper : IActorRepository
                 CONCAT(
                     UPPER(SUBSTRING(f.title, 1, 1)),
                     LOWER (SUBSTRING(f.title, 2))
-                    ) AS Film,                           
+                    ) AS FilmTitle,                           
                 c.name AS Category
             FROM film_actor fa
             JOIN actor a ON fa.actor_id = a.actor_id
