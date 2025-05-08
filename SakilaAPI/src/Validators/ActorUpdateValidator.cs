@@ -7,7 +7,7 @@ public class ActorUpdateValidator : AbstractValidator<ActorUpdateDto>
 {
     public ActorUpdateValidator()
     {
-         RuleFor(x => x.FirstName)
+        RuleFor(x => x.FirstName)
         .NotEmpty()
         .Length(2, 16)
         .NotEqual("string", StringComparer.OrdinalIgnoreCase)
