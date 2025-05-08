@@ -67,11 +67,33 @@ public class ActorRepositoryEF : IActorRepository
 
     public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, int page, int pageSize, CancellationToken cancellationToken)
     {
-        //first/last from Actor
+        _logger.LogInformation("Retrieveing actors by film and category using EF");
 
-        //return await _sakilaContext.FilmActors
+        var raw = await _sakilaContext.Actors
+        .AsNoTracking()
+        .Where(a => a.LastName.StartsWith(lastName))
+        .SelectMany(a => a.FilmActors, (a, fa) => new { a, fa })
+        .SelectMany(t => t.fa.Film.FilmCategories,
+                    (t, fc) => new {
+                    FirstName  = t.a.FirstName,
+                    LastName   = t.a.LastName,
+                    Title      = t.fa.Film.Title,
+                    CategoryId = fc.CategoryId
+                    }).ToListAsync(cancellationToken);
 
-        throw new NotImplementedException();
+        var dtos = raw
+            .AsEnumerable()
+            .Select(x => new ActorFilmCategoryDto(
+                StringHelpers.Capitalize(x.FirstName),
+                StringHelpers.Capitalize(x.LastName),
+                StringHelpers.Capitalize(x.Title),
+                ((FilmCategoryEnum)x.CategoryId).ToString()
+            ))
+            .OrderBy(dto => dto.LastName)    
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize);
+
+        return dtos;
     }
 
     public Task<Actor?> DeleteActorAsync(ushort id, CancellationToken ct)
