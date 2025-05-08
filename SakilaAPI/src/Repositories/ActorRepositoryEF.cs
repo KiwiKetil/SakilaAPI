@@ -59,8 +59,12 @@ public class ActorRepositoryEF : IActorRepository
         .ToListAsync(cancellationToken);                        
     }
 
-    public Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, int page, int pageSize, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, int page, int pageSize, CancellationToken cancellationToken)
     {
+        // first/last from Actor
+        // 
+
+        // return await _sakilaContext.FilmActors
         throw new NotImplementedException();
     }
 

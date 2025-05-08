@@ -31,14 +31,8 @@ public class ActorRepositoryDapper : IActorRepository
         const string sql = @"
             SELECT 
                 actor_id AS ActorId,
-                CONCAT(
-                    UPPER(SUBSTRING(first_name, 1, 1)),
-                    LOWER(SUBSTRING(first_name, 2))
-                    ) AS FirstName,
-                CONCAT(
-                    UPPER(SUBSTRING(last_name, 1, 1)),
-                    LOWER(SUBSTRING(last_name, 2))
-                    ) AS LastName,
+                first_name AS FirstName,
+                last_name AS LastName,
                 last_update AS LastUpdate
             FROM 
                 Actor
@@ -74,14 +68,8 @@ public class ActorRepositoryDapper : IActorRepository
         const string sql = @"
             SELECT
                 actor_id AS ActorId,
-                CONCAT(
-                    UPPER(SUBSTRING(first_name, 1, 1)),
-                    LOWER(SUBSTRING(first_name, 2))
-                    ) AS FirstName,
-                CONCAT(
-                    UPPER(SUBSTRING(last_name, 1, 1)),
-                    LOWER(SUBSTRING(last_name, 2))
-                    ) AS LastName,
+                first_name AS FirstName,
+                last_name AS LastName,
                 last_update AS LastUpdate
             FROM 
                 Actor
@@ -104,7 +92,7 @@ public class ActorRepositoryDapper : IActorRepository
         _logger.LogInformation("Retrieveing actors by film and category using Dapper");
 
         await using var connection = await _dbConnectionFactory.CreateConnectionAsync();      
-                                    // Trenger ikke lenger concat pga actormapper?
+                                   
         const string sql = @"
             SELECT 
                 CONCAT(

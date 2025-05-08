@@ -1,3 +1,4 @@
+using System.Globalization;
 using SakilaAPI.DTOs.Actor;
 using SakilaAPI.Mappers.Interfaces;
 using SakilaAPI.Models;
@@ -6,6 +7,8 @@ namespace SakilaAPI.Mappers;
 
 public class ActoRegistrationMapper : IMapper<Actor, ActorRegistrationDto>
 {
+     private readonly TextInfo ti = CultureInfo.InvariantCulture.TextInfo;
+     
     public ActorRegistrationDto MapToDto(Actor entity)
     {
         throw new NotImplementedException();        
@@ -15,8 +18,8 @@ public class ActoRegistrationMapper : IMapper<Actor, ActorRegistrationDto>
     {
         return new Actor
         {
-            FirstName = dto.FirstName,
-            LastName = dto.LastName
+            FirstName = dto.FirstName.Trim().ToUpper(),
+            LastName = dto.LastName.Trim().ToUpper()
         };
     }
 }
