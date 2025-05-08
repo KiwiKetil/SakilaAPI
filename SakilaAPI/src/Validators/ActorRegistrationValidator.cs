@@ -3,11 +3,11 @@ using SakilaAPI.DTOs.Actor;
 
 namespace SakilaAPI.Validators;
 
-public class ActorUpdateValidator : AbstractValidator<ActorUpdateDto>
+public class ActorRegistrationValidator : AbstractValidator<ActorRegistrationDto>
 {
-    public ActorUpdateValidator()
+    public ActorRegistrationValidator()
     {
-         RuleFor(x => x.FirstName)
+        RuleFor(x => x.FirstName)
         .NotEmpty()
         .Length(2, 16)
         .NotEqual("string", StringComparer.OrdinalIgnoreCase)
