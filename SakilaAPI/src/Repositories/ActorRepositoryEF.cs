@@ -4,6 +4,7 @@ using SakilaAPI.Models;
 using SakilaAPI.Repositories.Interfaces;
 using SakilaAPI.Dtos.Actor;
 using SakilaAPI.Models.Enums;
+using SakilaAPI.Helpers;
 
 namespace SakilaAPI.Repositories;
 
@@ -46,25 +47,30 @@ public class ActorRepositoryEF : IActorRepository
     {
         _logger.LogInformation("Retrieveing actors by film and category using EF");
 
-        return await _sakilaContext.FilmActors
+        var raw = await _sakilaContext.FilmActors
             .AsNoTracking()                                    
             .Where(fa => fa.Film.FilmCategories                
             .Any(fc => fc.CategoryId == (int)category))   
-            .Select(fa => new ActorFilmCategoryDto(              
+            .Select( fa => new {              
                 fa.Actor.FirstName,
                 fa.Actor.LastName,
-                fa.Film.Title,
-                category.ToString()
-        ))
-        .ToListAsync(cancellationToken);                        
+                fa.Film.Title                
+            }).ToListAsync(cancellationToken);         
+
+        return raw.Select(x => new ActorFilmCategoryDto(
+            StringHelpers.Capitalize(x.FirstName),
+            StringHelpers.Capitalize(x.LastName),
+            StringHelpers.Capitalize(x.Title),
+            category.ToString()           
+        ));                
     }
 
     public async Task<IEnumerable<ActorFilmCategoryDto>> GetActorFilmsByLastNameAsync(string lastName, int page, int pageSize, CancellationToken cancellationToken)
     {
-        // first/last from Actor
-        // 
+        //first/last from Actor
 
-        // return await _sakilaContext.FilmActors
+        //return await _sakilaContext.FilmActors
+
         throw new NotImplementedException();
     }
 
